@@ -1,0 +1,48 @@
+#
+# Description
+# -----------
+# The audio table stores audio files that are used by other modules.
+#
+# The files themselves are stored in ciniki-storage directory hashed by business uuid and file uuid.
+#
+# Fields
+# ------
+# id: 					The unique ID of the audio file.
+# uuid:					The Universal Unique ID for the audio file.
+# business_id:			The business the file is attached to.
+#
+# parent_id:			The parent ID of this is a transcoded or alternate version of another file.
+#
+# type:					The type of audio file uploaded.  This is used to determine how
+#						the file can and delivered through the website.
+#
+#						0 - unknown
+#						10 - flac
+#						20 - ogg
+#						30 - wave
+#						40 - mp3
+#
+# original_filename:	The original filename the file was uploaded with.  
+#
+# title:				The title or filename assigned to the audio file.
+#
+# checksum:				The crc32 checksum for the audio file.  This field is used to make sure
+#						duplicate files are not stored in the database.
+#
+# date_added:			The date and time the audio was added to the database.
+# last_updated:			The date and time the audio was last updated.
+#
+create table ciniki_audio (
+	id int not null auto_increment,
+	uuid char(36) not null,
+	business_id int not null,
+	parent_id int not null,
+	type tinyint unsigned not null,
+	original_filename varchar(150) not null,
+	title varchar(200) not null,
+	checksum int unsigned not null,
+	date_added datetime not null,
+	last_updated datetime not null,
+	primary key (id),
+	index sync (business_id, uuid, last_updated)
+) ENGINE=InnoDB, COMMENT='v1.01';
