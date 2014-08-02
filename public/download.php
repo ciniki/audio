@@ -60,6 +60,7 @@ function ciniki_audio_download(&$ciniki) {
 	$filename = $rc['file']['original_filename'];
 	$file_uuid = $rc['file']['file_uuid'];
 	$business_uuid = $rc['file']['business_uuid'];
+	$file_type = $rc['file']['type'];
 
 	//
 	// Move the file into storage
@@ -69,9 +70,6 @@ function ciniki_audio_download(&$ciniki) {
 		. '/ciniki.audio/'
 		. $file_uuid[0];
 	$storage_filename = $storage_dirname . '/' . $file_uuid;
-	error_log('--' . $storage_filename . '--');
-	$finfo = finfo_open(FILEINFO_MIME);
-	if( $finfo ) { error_log('Content-Type: ' . finfo_file($finfo, $storage_filename)); }
 	if( !is_file($storage_filename) ) {
 		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1888', 'msg'=>'Unable to find file'));
 	}
@@ -81,18 +79,19 @@ function ciniki_audio_download(&$ciniki) {
 	header('Cache-Control: no-cache, must-revalidate');
 	header('Pragma: no-cache');
 	// Set mime header
-	$finfo = finfo_open(FILEINFO_MIME);
-	if( $finfo ) { header('Content-Type: ' . finfo_file($finfo, $storage_filename)); }
+	switch($file_type) {
+		case 20: header('Content-Type: audio/ogg'); break;
+		case 30: header('Content-Type: audio/x-wav'); break;
+		case 40: header('Content-Type: audio/mpeg'); break;
+	}
 	// Specify Filename
 	header('Content-Disposition: attachment;filename="' . $filename . '"');
 	header('Content-Length: ' . filesize($storage_filename));
 	header('Cache-Control: max-age=0');
 
-	error_log('Downloading: ' . $storage_filename);
 	$fp = fopen($storage_filename, 'rb');
 	fpassthru($fp);
 
-
-	return array('stat'=>'ok');
+	return array('stat'=>'exit');
 }
 ?>

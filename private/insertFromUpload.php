@@ -27,8 +27,8 @@
 //
 function ciniki_audio_insertFromUpload(&$ciniki, $business_id, $upload_file, $name, $force_duplicate) {
 	$tmp_filename = $upload_file['tmp_name'];
-	error_log($tmp_filename);
 	$original_filename = $upload_file['name'];
+	$extension = preg_replace("/^.*\.([^\.]+)$/", "$1", $original_filename);
 	if( $name == null || $name == '' ) {
 		$name = $original_filename;
 
@@ -47,13 +47,26 @@ function ciniki_audio_insertFromUpload(&$ciniki, $business_id, $upload_file, $na
 	//
 	// FIXME: Get the type of audio file
 	//
-	$format = 'mp3';
-	$exif = array();
+	$finfo = new finfo(FILEINFO_MIME_TYPE);
+	$mime_type = $finfo->file($upload_file['tmp_name']);
 	$type = 0;
-	if( $format == 'mp3' ) {
-		$type = 40;
+	if( $mime_type == 'application/octet-stream' ) {
+		switch($extension) {
+			case 'ogg': $type = 20; break;
+			case 'wav': $type = 30; break;
+			case 'mp3': $type = 40; break;
+		}
 	} else {
-		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1871', 'msg'=>'Invalid format' . $format));
+		switch($mime_type) {
+			case 'application/ogg': $type = 20; break;
+			case 'audio/ogg': $type = 20; break;
+			case 'audio/wav': $type = 30; break;
+			case 'audio/x-wav': $type = 30; break;
+			case 'audio/mpeg': $type = 40; break;
+		}
+	}
+	if( $type == 0 ) {
+		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1871', 'msg'=>'Invalid format. ' . $mime_type . ', ' . $extension));
 	}
 
 	//
@@ -109,7 +122,6 @@ function ciniki_audio_insertFromUpload(&$ciniki, $business_id, $upload_file, $na
 		. '/ciniki.audio/'
 		. $uuid[0];
 	$storage_filename = $storage_dirname . '/' . $uuid;
-	error_log('--' . $storage_filename . '--');
 	if( !is_dir($storage_dirname) ) {
 		if( !mkdir($storage_dirname, 0700, true) ) {
 			ciniki_core_dbTransactionRollback($ciniki, 'ciniki.audio');
