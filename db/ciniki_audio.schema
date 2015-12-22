@@ -5,6 +5,8 @@
 #
 # The files themselves are stored in ciniki-storage directory hashed by business uuid and file uuid.
 #
+# 
+#
 # Fields
 # ------
 # id: 					The unique ID of the audio file.
@@ -27,7 +29,12 @@
 # title:				The title or filename assigned to the audio file.
 #
 # checksum:				The crc32 checksum for the audio file.  This field is used to make sure
-#						duplicate files are not stored in the database.
+#						duplicate files are not stored in the database. The checksum must be matched
+#                       with type to ensure unique. Several files may share a checksum of different
+#                       types if they were converted from an original file.
+#
+# dropbox_path:         The path in dropbox the file came from.
+# dropbox_rev:          The file revision from dropbox the file came from.
 #
 # date_added:			The date and time the audio was added to the database.
 # last_updated:			The date and time the audio was last updated.
@@ -41,8 +48,10 @@ create table ciniki_audio (
 	original_filename varchar(150) not null,
 	title varchar(200) not null,
 	checksum int unsigned not null,
+    dropbox_path varchar(250) not null,
+    dropbox_rev varchar(50) not null,
 	date_added datetime not null,
 	last_updated datetime not null,
 	primary key (id),
 	index sync (business_id, uuid, last_updated)
-) ENGINE=InnoDB, COMMENT='v1.01';
+) ENGINE=InnoDB, COMMENT='v1.02';

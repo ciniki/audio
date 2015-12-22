@@ -30,7 +30,9 @@ function ciniki_audio_hooks_insertFromFile(&$ciniki, $business_id, $args) { //$u
 
 	$file = file_get_contents($args['filename']);
 
-	$checksum = crc32($file);
+    if( !isset($args['checksum']) || $args['checksum'] == '' ) {
+        $args['checksum'] = crc32($file);
+    }
 
 	//
 	// Get the type of audio file
@@ -63,7 +65,9 @@ function ciniki_audio_hooks_insertFromFile(&$ciniki, $business_id, $args) { //$u
 	$strsql = "SELECT id, title "
         . "FROM ciniki_audio "
 		. "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
-		. "AND checksum = '" . ciniki_core_dbQuote($ciniki, $checksum) . "' ";
+		. "AND type = '" . ciniki_core_dbQuote($ciniki, $type) . "' "
+		. "AND checksum = '" . ciniki_core_dbQuote($ciniki, $args['checksum']) . "' "
+        . "";
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQuery');
 	$rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.audio', 'audio');
 	if( $rc['stat'] != 'ok' ) {
@@ -135,7 +139,9 @@ function ciniki_audio_hooks_insertFromFile(&$ciniki, $business_id, $args) { //$u
 		'type'=>$type,
 		'original_filename'=>$args['original_filename'],
 		'title'=>$args['name'],
-		'checksum'=>$checksum,
+		'checksum'=>$args['checksum'],
+        'dropbox_path'=>(isset($args['dropbox_path'])?$args['dropbox_path']:''),
+        'dropbox_rev'=>(isset($args['dropbox_rev'])?$args['dropbox_rev']:''),
 		);
 
 	//

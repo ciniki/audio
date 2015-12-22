@@ -1,0 +1,7 @@
+#
+# This file will add the uuid to ciniki_events
+# which is required for the sync to work.
+#
+ALTER TABLE ciniki_audio ADD COLUMN dropbox_path varchar(250) not null AFTER checksum;
+ALTER TABLE ciniki_audio ADD COLUMN dropbox_rev varchar(50) not null AFTER dropbox_path;
+ALTER TABLE ciniki_audio COMMENT='v1.02';

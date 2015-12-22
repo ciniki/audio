@@ -22,6 +22,8 @@ function ciniki_audio_objects($ciniki) {
 			'original_filename'=>array(),
 			'title'=>array(),
 			'checksum'=>array(),
+			'dropbox_path'=>array('default'=>''),
+			'dropbox_rev'=>array('default'=>''),
 			),
 		'history_table'=>'ciniki_audio_history',
 		);
