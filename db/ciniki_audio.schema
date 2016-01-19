@@ -47,11 +47,11 @@ create table ciniki_audio (
 	type tinyint unsigned not null,
 	original_filename varchar(150) not null,
 	title varchar(200) not null,
-	checksum int unsigned not null,
+	checksum varchar(250) not null,
     dropbox_path varchar(250) not null,
     dropbox_rev varchar(50) not null,
 	date_added datetime not null,
 	last_updated datetime not null,
 	primary key (id),
 	index sync (business_id, uuid, last_updated)
-) ENGINE=InnoDB, COMMENT='v1.02';
+) ENGINE=InnoDB, COMMENT='v1.03';
