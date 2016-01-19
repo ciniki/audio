@@ -31,7 +31,7 @@ function ciniki_audio_hooks_insertFromFile(&$ciniki, $business_id, $args) { //$u
 	$file = file_get_contents($args['filename']);
 
     if( !isset($args['checksum']) || $args['checksum'] == '' ) {
-        $args['checksum'] = crc32($file);
+        $args['checksum'] = hash_file('md5', $file);
     }
 
 	//
