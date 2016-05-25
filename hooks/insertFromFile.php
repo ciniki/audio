@@ -122,6 +122,7 @@ function ciniki_audio_hooks_insertFromFile(&$ciniki, $business_id, $args) { //$u
 			return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2920', 'msg'=>'Unable to add file'));
 		}
 	}
+
     //
     // Use copy so it will work with ssh2.sftp file systems
     //
