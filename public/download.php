@@ -9,7 +9,7 @@
 // ---------
 // api_key:
 // auth_token:
-// business_id:		The ID of the business to add the audio to.
+// business_id:     The ID of the business to add the audio to.
 // 
 // Returns
 // -------
@@ -39,59 +39,59 @@ function ciniki_audio_download(&$ciniki) {
         return $rc;
     }   
 
-	//
-	// Get the uuid for the file
-	//
-	$strsql = "SELECT ciniki_businesses.uuid AS business_uuid, ciniki_audio.uuid AS file_uuid, "
-		. "ciniki_audio.title AS name, ciniki_audio.type, ciniki_audio.original_filename "
-		. "FROM ciniki_audio, ciniki_businesses "
-		. "WHERE ciniki_audio.id = '" . ciniki_core_dbQuote($ciniki, $args['audio_id']) . "' "
-		. "AND ciniki_audio.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
-		. "AND ciniki_businesses.id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
-		. "";
-	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQuery');
-	$rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.audio', 'file');
-	if( $rc['stat'] != 'ok' ) {
-		return $rc;
-	}
-	if( !isset($rc['file']) ) {
-		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1852', 'msg'=>'Unable to find file'));
-	}
-	$filename = $rc['file']['original_filename'];
-	$file_uuid = $rc['file']['file_uuid'];
-	$business_uuid = $rc['file']['business_uuid'];
-	$file_type = $rc['file']['type'];
+    //
+    // Get the uuid for the file
+    //
+    $strsql = "SELECT ciniki_businesses.uuid AS business_uuid, ciniki_audio.uuid AS file_uuid, "
+        . "ciniki_audio.title AS name, ciniki_audio.type, ciniki_audio.original_filename "
+        . "FROM ciniki_audio, ciniki_businesses "
+        . "WHERE ciniki_audio.id = '" . ciniki_core_dbQuote($ciniki, $args['audio_id']) . "' "
+        . "AND ciniki_audio.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+        . "AND ciniki_businesses.id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+        . "";
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQuery');
+    $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.audio', 'file');
+    if( $rc['stat'] != 'ok' ) {
+        return $rc;
+    }
+    if( !isset($rc['file']) ) {
+        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1852', 'msg'=>'Unable to find file'));
+    }
+    $filename = $rc['file']['original_filename'];
+    $file_uuid = $rc['file']['file_uuid'];
+    $business_uuid = $rc['file']['business_uuid'];
+    $file_type = $rc['file']['type'];
 
-	//
-	// Move the file into storage
-	//
-	$storage_dirname = $ciniki['config']['ciniki.core']['storage_dir'] . '/'
-		. $business_uuid[0] . '/' . $business_uuid 
-		. '/ciniki.audio/'
-		. $file_uuid[0];
-	$storage_filename = $storage_dirname . '/' . $file_uuid;
-	if( !is_file($storage_filename) ) {
-		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1888', 'msg'=>'Unable to find file'));
-	}
+    //
+    // Move the file into storage
+    //
+    $storage_dirname = $ciniki['config']['ciniki.core']['storage_dir'] . '/'
+        . $business_uuid[0] . '/' . $business_uuid 
+        . '/ciniki.audio/'
+        . $file_uuid[0];
+    $storage_filename = $storage_dirname . '/' . $file_uuid;
+    if( !is_file($storage_filename) ) {
+        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1888', 'msg'=>'Unable to find file'));
+    }
 
-	header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); 
-	header("Last-Modified: " . gmdate("D,d M YH:i:s") . " GMT"); 
-	header('Cache-Control: no-cache, must-revalidate');
-	header('Pragma: no-cache');
-	// Set mime header
-	switch($file_type) {
-		case 20: header('Content-Type: audio/ogg'); break;
-		case 30: header('Content-Type: audio/x-wav'); break;
-		case 40: header('Content-Type: audio/mpeg'); break;
-	}
-	// Specify Filename
-	header('Content-Disposition: attachment;filename="' . $filename . '"');
-	header('Content-Length: ' . filesize($storage_filename));
-	header('Cache-Control: max-age=0');
+    header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); 
+    header("Last-Modified: " . gmdate("D,d M YH:i:s") . " GMT"); 
+    header('Cache-Control: no-cache, must-revalidate');
+    header('Pragma: no-cache');
+    // Set mime header
+    switch($file_type) {
+        case 20: header('Content-Type: audio/ogg'); break;
+        case 30: header('Content-Type: audio/x-wav'); break;
+        case 40: header('Content-Type: audio/mpeg'); break;
+    }
+    // Specify Filename
+    header('Content-Disposition: attachment;filename="' . $filename . '"');
+    header('Content-Length: ' . filesize($storage_filename));
+    header('Cache-Control: max-age=0');
 
-	$fp = fopen($storage_filename, 'rb');
-	fpassthru($fp);
+    $fp = fopen($storage_filename, 'rb');
+    fpassthru($fp);
 
-	return array('stat'=>'exit');
+    return array('stat'=>'exit');
 }
 ?>
