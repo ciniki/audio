@@ -17,7 +17,7 @@
 function ciniki_audio_hooks_insertFromFile(&$ciniki, $business_id, $args) { //$upload_file, $name, $force_duplicate) {
     
     if( !isset($args['filename']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2915', 'msg'=>'Missing file'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.audio.1', 'msg'=>'Missing file'));
     }
 
     $extension = preg_replace("/^.*\.([^\.]+)$/", "$1", $args['filename']);
@@ -56,7 +56,7 @@ function ciniki_audio_hooks_insertFromFile(&$ciniki, $business_id, $args) { //$u
         }
     }
     if( $type == 0 ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2916', 'msg'=>'Invalid format. ' . $mime_type . ', ' . $extension));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.audio.2', 'msg'=>'Invalid format. ' . $mime_type . ', ' . $extension));
     }
 
     //
@@ -71,7 +71,7 @@ function ciniki_audio_hooks_insertFromFile(&$ciniki, $business_id, $args) { //$u
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQuery');
     $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.audio', 'audio');
     if( $rc['stat'] != 'ok' ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2917', 'msg'=>'Unable to check for duplicates', 'err'=>$rc['err']));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.audio.3', 'msg'=>'Unable to check for duplicates', 'err'=>$rc['err']));
     }
 
     //
@@ -79,7 +79,7 @@ function ciniki_audio_hooks_insertFromFile(&$ciniki, $business_id, $args) { //$u
     //
     if( isset($rc['audio']) && (!isset($args['force_duplicate']) || $args['force_duplicate'] != 'yes') ) {
         // Return the ID incase the calling script wants to use the existing image
-        return array('stat'=>'exists', 'id'=>$rc['audio']['id'], 'err'=>array('pkg'=>'ciniki', 'code'=>'2918', 'msg'=>'Duplicate file'));
+        return array('stat'=>'exists', 'id'=>$rc['audio']['id'], 'err'=>array('code'=>'ciniki.audio.4', 'msg'=>'Duplicate file'));
     }
 
     //
@@ -93,7 +93,7 @@ function ciniki_audio_hooks_insertFromFile(&$ciniki, $business_id, $args) { //$u
         return $rc;
     }
     if( !isset($rc['business']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2919', 'msg'=>'Unable to get business details'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.audio.5', 'msg'=>'Unable to get business details'));
     }
 
     $business_uuid = $rc['business']['uuid'];
@@ -119,7 +119,7 @@ function ciniki_audio_hooks_insertFromFile(&$ciniki, $business_id, $args) { //$u
     if( !is_dir($storage_dirname) ) {
         if( !mkdir($storage_dirname, 0700, true) ) {
             ciniki_core_dbTransactionRollback($ciniki, 'ciniki.audio');
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2920', 'msg'=>'Unable to add file'));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.audio.6', 'msg'=>'Unable to add file'));
         }
     }
 
@@ -128,7 +128,7 @@ function ciniki_audio_hooks_insertFromFile(&$ciniki, $business_id, $args) { //$u
     //
     if( !copy($args['filename'], $storage_filename) ) {
         ciniki_core_dbTransactionRollback($ciniki, 'ciniki.audio');
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2921', 'msg'=>'Unable to add file'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.audio.7', 'msg'=>'Unable to add file'));
     }
 
     //

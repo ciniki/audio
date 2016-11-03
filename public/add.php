@@ -67,11 +67,11 @@ function ciniki_audio_add(&$ciniki) {
         // If a duplicate audio is found, then use that id instead of uploading a new one
         if( $rc['stat'] != 'ok' && $rc['stat'] != 'exists' ) {
             ciniki_core_dbTransactionRollback($ciniki, 'ciniki.audio');
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1881', 'msg'=>'Internal Error', 'err'=>$rc['err']));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.audio.27', 'msg'=>'Internal Error', 'err'=>$rc['err']));
         }
         if( !isset($rc['id']) ) {
             ciniki_core_dbTransactionRollback($ciniki, 'ciniki.audio');
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1882', 'msg'=>'Invalid file type'));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.audio.28', 'msg'=>'Invalid file type'));
         }
         $audio_id = $rc['id'];
 
@@ -82,7 +82,7 @@ function ciniki_audio_add(&$ciniki) {
         // Check to see if an audio was uploaded
         //
         if( isset($_FILES['uploadfile']['error']) && $_FILES['uploadfile']['error'] == UPLOAD_ERR_INI_SIZE ) {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1883', 'msg'=>'Upload failed, file too large.'));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.audio.29', 'msg'=>'Upload failed, file too large.'));
         }
         // FIXME: Add other checkes for $_FILES['uploadfile']['error']
 
@@ -90,7 +90,7 @@ function ciniki_audio_add(&$ciniki) {
         // Check for a uploaded file
         //
         if( !isset($_FILES) || !isset($_FILES['uploadfile']) || $_FILES['uploadfile']['tmp_name'] == '' ) {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1884', 'msg'=>'Upload failed, no file specified.'));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.audio.30', 'msg'=>'Upload failed, no file specified.'));
         }
         $uploaded_file = $_FILES['uploadfile']['tmp_name'];
 
@@ -103,11 +103,11 @@ function ciniki_audio_add(&$ciniki) {
         // If a duplicate audio is found, then use that id instead of uploading a new one
         if( $rc['stat'] != 'ok' && $rc['stat'] != 'exists' ) {
             ciniki_core_dbTransactionRollback($ciniki, 'ciniki.audio');
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1885', 'msg'=>'Internal Error', 'err'=>$rc['err']));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.audio.31', 'msg'=>'Internal Error', 'err'=>$rc['err']));
         }
         if( !isset($rc['id']) ) {
             ciniki_core_dbTransactionRollback($ciniki, 'ciniki.audio');
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1886', 'msg'=>'Invalid file type'));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.audio.32', 'msg'=>'Invalid file type'));
         }
         $audio_id = $rc['id'];
     }

@@ -55,7 +55,7 @@ function ciniki_audio_download(&$ciniki) {
         return $rc;
     }
     if( !isset($rc['file']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1852', 'msg'=>'Unable to find file'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.audio.33', 'msg'=>'Unable to find file'));
     }
     $filename = $rc['file']['original_filename'];
     $file_uuid = $rc['file']['file_uuid'];
@@ -71,7 +71,7 @@ function ciniki_audio_download(&$ciniki) {
         . $file_uuid[0];
     $storage_filename = $storage_dirname . '/' . $file_uuid;
     if( !is_file($storage_filename) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1888', 'msg'=>'Unable to find file'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.audio.34', 'msg'=>'Unable to find file'));
     }
 
     header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); 
