@@ -1,7 +1,7 @@
-Ciniki - Small Business Management Platform
+Ciniki - Multitenant Cloud Platform
 ===========================================
 
-The audio module stores the library of audio files for businesses.
+The audio module stores the library of audio files for tenants.
 
 License
 -------

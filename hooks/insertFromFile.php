@@ -7,14 +7,14 @@
 // Arguments
 // ---------
 // ciniki:
-// business_id:     The ID of the business the photo is attached to.
+// tnid:     The ID of the tenant the photo is attached to.
 //
 // 
 // Returns
 // -------
 // The audio ID that was added.
 //
-function ciniki_audio_hooks_insertFromFile(&$ciniki, $business_id, $args) { //$upload_file, $name, $force_duplicate) {
+function ciniki_audio_hooks_insertFromFile(&$ciniki, $tnid, $args) { //$upload_file, $name, $force_duplicate) {
     
     if( !isset($args['filename']) ) {
         return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.audio.1', 'msg'=>'Missing file'));
@@ -64,7 +64,7 @@ function ciniki_audio_hooks_insertFromFile(&$ciniki, $business_id, $args) { //$u
     //
     $strsql = "SELECT id, title "
         . "FROM ciniki_audio "
-        . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+        . "WHERE tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
         . "AND type = '" . ciniki_core_dbQuote($ciniki, $type) . "' "
         . "AND checksum = '" . ciniki_core_dbQuote($ciniki, $args['checksum']) . "' "
         . "";
@@ -83,20 +83,20 @@ function ciniki_audio_hooks_insertFromFile(&$ciniki, $business_id, $args) { //$u
     }
 
     //
-    // Get the business UUID
+    // Get the tenant UUID
     //
     $strsql = "SELECT uuid "
-        . "FROM ciniki_businesses "
-        . "WHERE id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' ";
-    $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.businesses', 'business');
+        . "FROM ciniki_tenants "
+        . "WHERE id = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' ";
+    $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.tenants', 'tenant');
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
-    if( !isset($rc['business']) ) {
-        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.audio.5', 'msg'=>'Unable to get business details'));
+    if( !isset($rc['tenant']) ) {
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.audio.5', 'msg'=>'Unable to get tenant details'));
     }
 
-    $business_uuid = $rc['business']['uuid'];
+    $tenant_uuid = $rc['tenant']['uuid'];
 
     //
     // Get a new UUID
@@ -112,7 +112,7 @@ function ciniki_audio_hooks_insertFromFile(&$ciniki, $business_id, $args) { //$u
     // Move the file to ciniki-storage
     //
     $storage_dirname = $ciniki['config']['ciniki.core']['storage_dir'] . '/'
-        . $business_uuid[0] . '/' . $business_uuid
+        . $tenant_uuid[0] . '/' . $tenant_uuid
         . '/ciniki.audio/'
         . $uuid[0];
     $storage_filename = $storage_dirname . '/' . $uuid;
@@ -149,7 +149,7 @@ function ciniki_audio_hooks_insertFromFile(&$ciniki, $business_id, $args) { //$u
     // Add the object
     // 
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'objectAdd');
-    $rc = ciniki_core_objectAdd($ciniki, $business_id, 'ciniki.audio.file', $object_args);
+    $rc = ciniki_core_objectAdd($ciniki, $tnid, 'ciniki.audio.file', $object_args);
 
     return array('stat'=>'ok', 'id'=>$rc['id']);
 }

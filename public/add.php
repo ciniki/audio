@@ -9,7 +9,7 @@
 // ---------
 // api_key:
 // auth_token:
-// business_id:     The ID of the business to add the audio to.
+// tnid:     The ID of the tenant to add the audio to.
 // 
 // Returns
 // -------
@@ -21,7 +21,7 @@ function ciniki_audio_add(&$ciniki) {
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
         'url'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'URL'), 
         )); 
     if( $rc['stat'] != 'ok' ) { 
@@ -31,10 +31,10 @@ function ciniki_audio_add(&$ciniki) {
 
     //  
     // Make sure this module is activated, and
-    // check permission to run this function for this business
+    // check permission to run this function for this tenant
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'audio', 'private', 'checkAccess');
-    $rc = ciniki_audio_checkAccess($ciniki, $args['business_id'], 'ciniki.audio.add'); 
+    $rc = ciniki_audio_checkAccess($ciniki, $args['tnid'], 'ciniki.audio.add'); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
     }   
@@ -62,7 +62,7 @@ function ciniki_audio_add(&$ciniki) {
         // Add the audio into the database
         //
         ciniki_core_loadMethod($ciniki, 'ciniki', 'audio', 'private', 'insertFromURL');
-        $rc = ciniki_audio_insertFromURL($ciniki, $args['business_id'], 
+        $rc = ciniki_audio_insertFromURL($ciniki, $args['tnid'], 
             $args['url'], basename($args['url']), 'no');
         // If a duplicate audio is found, then use that id instead of uploading a new one
         if( $rc['stat'] != 'ok' && $rc['stat'] != 'exists' ) {
@@ -98,7 +98,7 @@ function ciniki_audio_add(&$ciniki) {
         // Add the audio into the database
         //
         ciniki_core_loadMethod($ciniki, 'ciniki', 'audio', 'private', 'insertFromUpload');
-        $rc = ciniki_audio_insertFromUpload($ciniki, $args['business_id'], 
+        $rc = ciniki_audio_insertFromUpload($ciniki, $args['tnid'], 
             $_FILES['uploadfile'], $_FILES['uploadfile']['name'], 'no');
         // If a duplicate audio is found, then use that id instead of uploading a new one
         if( $rc['stat'] != 'ok' && $rc['stat'] != 'exists' ) {

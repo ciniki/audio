@@ -9,7 +9,7 @@
 // ---------
 // api_key:
 // auth_token:
-// business_id:     The ID of the business to add the audio to.
+// tnid:     The ID of the tenant to add the audio to.
 // 
 // Returns
 // -------
@@ -21,7 +21,7 @@ function ciniki_audio_download(&$ciniki) {
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
         'audio_id'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Audio File'), 
         )); 
     if( $rc['stat'] != 'ok' ) { 
@@ -31,10 +31,10 @@ function ciniki_audio_download(&$ciniki) {
 
     //  
     // Make sure this module is activated, and
-    // check permission to run this function for this business
+    // check permission to run this function for this tenant
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'audio', 'private', 'checkAccess');
-    $rc = ciniki_audio_checkAccess($ciniki, $args['business_id'], 'ciniki.audio.download'); 
+    $rc = ciniki_audio_checkAccess($ciniki, $args['tnid'], 'ciniki.audio.download'); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
     }   
@@ -42,12 +42,12 @@ function ciniki_audio_download(&$ciniki) {
     //
     // Get the uuid for the file
     //
-    $strsql = "SELECT ciniki_businesses.uuid AS business_uuid, ciniki_audio.uuid AS file_uuid, "
+    $strsql = "SELECT ciniki_tenants.uuid AS tenant_uuid, ciniki_audio.uuid AS file_uuid, "
         . "ciniki_audio.title AS name, ciniki_audio.type, ciniki_audio.original_filename "
-        . "FROM ciniki_audio, ciniki_businesses "
+        . "FROM ciniki_audio, ciniki_tenants "
         . "WHERE ciniki_audio.id = '" . ciniki_core_dbQuote($ciniki, $args['audio_id']) . "' "
-        . "AND ciniki_audio.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
-        . "AND ciniki_businesses.id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+        . "AND ciniki_audio.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
+        . "AND ciniki_tenants.id = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
         . "";
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQuery');
     $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.audio', 'file');
@@ -59,14 +59,14 @@ function ciniki_audio_download(&$ciniki) {
     }
     $filename = $rc['file']['original_filename'];
     $file_uuid = $rc['file']['file_uuid'];
-    $business_uuid = $rc['file']['business_uuid'];
+    $tenant_uuid = $rc['file']['tenant_uuid'];
     $file_type = $rc['file']['type'];
 
     //
     // Move the file into storage
     //
     $storage_dirname = $ciniki['config']['ciniki.core']['storage_dir'] . '/'
-        . $business_uuid[0] . '/' . $business_uuid 
+        . $tenant_uuid[0] . '/' . $tenant_uuid 
         . '/ciniki.audio/'
         . $file_uuid[0];
     $storage_filename = $storage_dirname . '/' . $file_uuid;

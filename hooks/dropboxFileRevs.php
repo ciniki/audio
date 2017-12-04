@@ -7,18 +7,18 @@
 // Arguments
 // ---------
 // ciniki:
-// business_id:     The ID of the business the photo is attached to.
+// tnid:     The ID of the tenant the photo is attached to.
 //
 // 
 // Returns
 // -------
 // The audio ID that was added.
 //
-function ciniki_audio_hooks_dropboxFileRevs(&$ciniki, $business_id, $args) {
+function ciniki_audio_hooks_dropboxFileRevs(&$ciniki, $tnid, $args) {
    
     $strsql = "SELECT original_filename, dropbox_path, dropbox_rev "
         . "FROM ciniki_audio "
-        . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+        . "WHERE tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
         . "AND dropbox_path = '" . ciniki_core_dbQuote($ciniki, $args['path']) . "' "
         . "";
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryIDTree');

@@ -9,7 +9,7 @@
 // Arguments
 // ---------
 // ciniki:
-// business_id:     The ID of the business the photo is attached to.
+// tnid:     The ID of the tenant the photo is attached to.
 //
 //
 // upload_file:     The array from $_FILES[upload_field_name].
@@ -18,14 +18,14 @@
 //                  The $file['name'] is used as the name of the photo.
 //
 // force_duplicate: If this is set to 'yes' and the image crc32 checksum is found
-//                  already belonging to this business, the image will still be inserted 
+//                  already belonging to this tenant, the image will still be inserted 
 //                  into the database.
 // 
 // Returns
 // -------
 // The image ID that was added.
 //
-function ciniki_audio_insertFromUpload(&$ciniki, $business_id, $upload_file, $name, $force_duplicate) {
+function ciniki_audio_insertFromUpload(&$ciniki, $tnid, $upload_file, $name, $force_duplicate) {
     $tmp_filename = $upload_file['tmp_name'];
     $original_filename = $upload_file['name'];
     $extension = preg_replace("/^.*\.([^\.]+)$/", "$1", $original_filename);
@@ -73,7 +73,7 @@ function ciniki_audio_insertFromUpload(&$ciniki, $business_id, $upload_file, $na
     // Add code to check for duplicate file based on crc
     //
     $strsql = "SELECT id, title FROM ciniki_audio "
-        . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+        . "WHERE tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
         . "AND checksum = '" . ciniki_core_dbQuote($ciniki, $checksum) . "' ";
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQuery');
     $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.audio', 'audio');
@@ -90,19 +90,19 @@ function ciniki_audio_insertFromUpload(&$ciniki, $business_id, $upload_file, $na
     }
 
     //
-    // Get the business UUID
+    // Get the tenant UUID
     //
-    $strsql = "SELECT uuid FROM ciniki_businesses "
-        . "WHERE id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' ";
-    $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.businesses', 'business');
+    $strsql = "SELECT uuid FROM ciniki_tenants "
+        . "WHERE id = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' ";
+    $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.tenants', 'tenant');
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
-    if( !isset($rc['business']) ) {
-        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.audio.24', 'msg'=>'Unable to get business details'));
+    if( !isset($rc['tenant']) ) {
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.audio.24', 'msg'=>'Unable to get tenant details'));
     }
 
-    $business_uuid = $rc['business']['uuid'];
+    $tenant_uuid = $rc['tenant']['uuid'];
 
     //
     // Get a new UUID
@@ -118,7 +118,7 @@ function ciniki_audio_insertFromUpload(&$ciniki, $business_id, $upload_file, $na
     // Move the file to ciniki-storage
     //
     $storage_dirname = $ciniki['config']['ciniki.core']['storage_dir'] . '/'
-        . $business_uuid[0] . '/' . $business_uuid
+        . $tenant_uuid[0] . '/' . $tenant_uuid
         . '/ciniki.audio/'
         . $uuid[0];
     $storage_filename = $storage_dirname . '/' . $uuid;
@@ -149,7 +149,7 @@ function ciniki_audio_insertFromUpload(&$ciniki, $business_id, $upload_file, $na
     // Add the object
     // 
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'objectAdd');
-    $rc = ciniki_core_objectAdd($ciniki, $business_id, 'ciniki.audio.file', $args);
+    $rc = ciniki_core_objectAdd($ciniki, $tnid, 'ciniki.audio.file', $args);
 
     return array('stat'=>'ok', 'id'=>$rc['id']);
 }
